@@ -85,3 +85,32 @@ export const getPartyColor = (partyName: string) => {
       </div>
     `;
    };
+
+
+  
+   export const pobrezaColorStops = [
+    { color: '#11ff00ff', value: 'Bajo' },
+    { color: '#deff0aff', value: '' },
+    { color: '#fbbe04ff', value: 'Medio' },
+    { color: '#ff6600ff', value: '' },
+    { color: '#ff0303ff', value: 'Alto' }
+  ];
+  
+  export const getPovertyColor = (nivel: number): string => {
+      // Ajusta estos colores y umbrales a la escala de CONEVAL 
+      if (nivel >= 10) return '#b71c1c'; // Rojo  - Pobreza Muy Alta
+      if (nivel >= 8) return '#ff4400ff'; // Naranja - Pobreza  Alta
+      if (nivel >= 6) return '#ff9500ff'; // Amarillo - Pobreza Media
+      if (nivel >= 4) return '#fbe600ff'; // Amarillo - Pobreza Media/Baja
+      if (nivel >= 2) return '#d1f41eff'; // Verde - Pobreza Baja
+      if (nivel >= 0) return '#12f116ff'; // Verde - Sin Pobreza
+  };
+  
+  export const getPovertyLabel = (nivel: number): string => {
+      if (nivel >= 10) return 'Muy Alta'; 
+      if (nivel >= 8) return 'Alta'; 
+      if (nivel >= 6) return 'Media'; 
+      if (nivel >= 4) return 'Media/Baja'; 
+      if (nivel >= 2) return 'Baja'; 
+      if (nivel >= 0) return 'Nula'; 
+  };

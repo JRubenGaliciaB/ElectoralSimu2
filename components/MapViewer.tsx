@@ -9,8 +9,10 @@ import { ConevalData } from '../data/Coneval';
 import { useLayerControls } from '../context/LayerControlContext'; 
 import { useAppContext } from '../context/MapContext';
 import { useChatContext } from '../context/ChatContext';
-import { getPartyColor, generatePopupHtml } from './mapUtils';
+import { getPartyColor, generatePopupHtml, getPovertyColor, getPovertyLabel, pobrezaColorStops  } from './mapUtils';
 import { Layers } from 'lucide-react';
+import LegendPob from './LegendPob';
+
 
 
 // Component to update view
@@ -98,25 +100,6 @@ const MapViewer: React.FC<MapViewerProps> = ({
       if (showConeval) return ConevalData;
       return null;
   }, [showConeval]);
-
-  const getPovertyColor = (nivel: number): string => {
-      // Ajusta estos colores y umbrales a la escala de CONEVAL 
-      if (nivel >= 10) return '#b71c1c'; // Rojo  - Pobreza Muy Alta
-      if (nivel >= 8) return '#ff4400ff'; // Naranja - Pobreza  Alta
-      if (nivel >= 6) return '#fff200ff'; // Amarillo - Pobreza Media
-      if (nivel >= 4) return '#cdfb00ff'; // Amarillo - Pobreza Media/Baja
-      if (nivel >= 2) return '#6aff00ff'; // Verde - Pobreza Baja
-      if (nivel >= 0) return '#097a0bff'; // Verde - Sin Pobreza
-  };
-  
-  const getPovertyLabel = (nivel: number): string => {
-      if (nivel >= 10) return 'Muy Alta'; 
-      if (nivel >= 8) return 'Alta'; 
-      if (nivel >= 6) return 'Media'; 
-      if (nivel >= 4) return 'Media/Baja'; 
-      if (nivel >= 2) return 'Baja'; 
-      if (nivel >= 0) return 'Nula'; 
-  };
 
   // 3. Unified GeoJSON style
   const geoJsonStyle = (feature: any) => {
@@ -259,6 +242,16 @@ const geoJsonKey = `geo-layer-${activeElectionData ? activeElectionData.year : '
             </div>
          </div>
       </div>
+
+             {/* Leyenda de Pobreza */}
+      {showConeval && (
+        <LegendPob 
+          title="Grado de Pobreza Urbana (2020)"
+          colorStops={pobrezaColorStops}
+          minLabel="Bajo"
+          maxLabel="Alto"
+        />
+      )}
       
       <MapEventsHandler onMoveEnd={onMapMoveEnd} />
     </MapContainer>

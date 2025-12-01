@@ -9,6 +9,7 @@ import { MapProvider, useAppContext } from './context/MapContext';
 import { ChatProvider } from './context/ChatContext';
 import WelcomeScreen from './components/WelcomeScreen';
 
+
 //MAPA al Iniciar
 const DEFAULT_CENTER: [number, number] = [20.7888, -99.6999]; 
 const DEFAULT_ZOOM = 9.2; 
@@ -19,7 +20,7 @@ const AppContent: React.FC = () => {
   const { handleLocateMe, setMapCenter, setMapZoom } = useAppContext();
 
 
-  {/* Se mantiene el useCallback para la gestión del movimiento del mapa */}
+  {/* useCallback para la gestión del movimiento del mapa */}
   const handleMapMoveEnd = useCallback((center: { lat: number; lng: number }, zoom: number) => {
     setMapCenter([center.lat, center.lng]);
     setMapZoom(zoom);

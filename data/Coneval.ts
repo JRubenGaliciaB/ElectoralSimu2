@@ -3,41 +3,34 @@ import { Coneval } from '../types'; // Asumiendo que 'Coneval' es el tipo de dat
 // PASTE YOUR RAW EXCEL DATA HERE
 // Format: Municipio    Seccion Nivel Pobreza
 const RAW_ELECTION_DATA = `
-Amealco de Bonfil	1	4
-Amealco de Bonfil	2	4
-Amealco de Bonfil	3	4
-Amealco de Bonfil	4	4
-Amealco de Bonfil	5	4
-Amealco de Bonfil	6	4
-Amealco de Bonfil	7	4
-Amealco de Bonfil	8	4
-Amealco de Bonfil	9	4
-Amealco de Bonfil	10	4
-Amealco de Bonfil	11	4
-Amealco de Bonfil	12	4
-Amealco de Bonfil	13	4
-Amealco de Bonfil	14	4
-Amealco de Bonfil	15	4
-Amealco de Bonfil	16	4
-Amealco de Bonfil	17	4
-Amealco de Bonfil	18	4
-Amealco de Bonfil	19	4
-Amealco de Bonfil	20	8
-Amealco de Bonfil	21	8
-Amealco de Bonfil	22	4
-Amealco de Bonfil	23	8
-Amealco de Bonfil	24	4
-Amealco de Bonfil	25	8
-Amealco de Bonfil	26	8
-Amealco de Bonfil	27	8
-Amealco de Bonfil	28	8
-Amealco de Bonfil	29	4
-Amealco de Bonfil	30	4
-Amealco de Bonfil	31	4
-Amealco de Bonfil	32	4
-Amealco de Bonfil	33	4
-Amealco de Bonfil	34	4
-
+Colón	76	4
+Colón	77	4
+Colón	78	4
+Colón	79	4
+Colón	80	4
+Colón	81	4
+Colón	82	4
+Colón	83	4
+Colón	84	4
+Colón	85	4
+Colón	86	4
+Colón	87	4
+Colón	88	4
+Colón	89	4
+Colón	90	4
+Colón	91	4
+Colón	92	4
+Colón	93	4
+Colón	94	6
+Colón	95	6
+Colón	96	4
+Colón	894	4
+Colón	895	4
+Colón	896	4
+Colón	971	4
+Colón	972	4
+Colón	973	4
+Colón	974	4
 `;
 
 const parseConeval = (rawData: string): Record<string, Coneval> => {
