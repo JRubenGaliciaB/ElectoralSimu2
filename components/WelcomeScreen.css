@@ -1,0 +1,81 @@
+ .welcome-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Fondo oscuro y ligeramente transparente para oscurecer la página */
+  background-color: rgba(0, 0, 0, 0.7); 
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  
+  /* CLAVE: Desenfoque del fondo (el efecto 'backdrop-blur') */
+  backdrop-filter: blur(4px); 
+}
+
+/*
+ * --------------------------------
+ * 2. Estilos para la Ventana de Contenido (.welcome-content)
+ * --------------------------------
+ */
+.welcome-content {
+  /* Fondo oscuro y semitransparente (similar a bg-slate-900/90) */
+  background-color: rgba(15, 23, 42, 0.95); 
+  
+  /* Borde y esquinas redondeadas */
+  border: 1px solid rgb(51, 65, 85); /* Similar a border-slate-700 */
+  border-radius: 12px; 
+  
+  /* Sombra  */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.5); 
+  
+  padding: 25px; 
+  text-align: center; 
+  width: 450px; /* Ancho fijo */
+}
+
+/* Estilo para el separador dentro del diálogo */
+.welcome-content .header-separator {
+    border-bottom: 1px solid #1e293b; /* Un gris muy oscuro */
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+
+/*
+ * --------------------------------
+ * 3. Estilos de Tipografía y Botón
+ * --------------------------------
+ */
+.welcome-content h1 {
+  /* Color blanco para el texto principal */
+  color: white; 
+  font-size: 28px; 
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.welcome-content p {
+  /* Color gris claro para texto secundario */
+  color: #94a3b8; 
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.welcome-content button {
+  padding: 10px 20px;
+  /* Estilo del botón primario */
+  background-color: #3b82f6; /* Azul vibrante */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.welcome-content button:hover {
+  background-color: #2563eb; 
+}

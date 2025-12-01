@@ -1,0 +1,7 @@
+{
+  "name": "ElectoralQro",
+  "description": "Gemini-powered geospatial search.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
