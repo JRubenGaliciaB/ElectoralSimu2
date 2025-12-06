@@ -23,14 +23,19 @@ interface ChatProviderProps {
 }
 
 export const ChatProvider: React.FC<ChatProviderProps> = ({ children }) => {
-  const { mapCenter, setMapCenter, setMapZoom, isAutoRecenterEnabled } = useAppContext();
-  const [searchResults, setSearchResults] = useState<GeoLocation[]>([]);
+  const { mapCenter, setMapCenter, setMapZoom, isAutoRecenterEnabled, setSearchResults } = useAppContext();
+  const [searchResults ] = useState<GeoLocation[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
   const handleSearch = async (query: string) => {
-    setIsSearching(true);
-    try {
+    if (!query.trim()) {
+        setSearchResults([]); // Limpia los marcadores en el mapa
+        return; // Detiene la ejecución para evitar llamar a searchLocations con cadena vacía
+    }
+
+ setIsSearching(true);
+ try {
       const center = { lat: mapCenter[0], lng: mapCenter[1] };
       const results = await searchLocations(query, center);
       setSearchResults(results);

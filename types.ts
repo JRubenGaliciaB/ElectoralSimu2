@@ -3,8 +3,22 @@ export interface GeoLocation {
   lat: number;
   lng: number;
   name: string;
-  description?: string;
-  category?: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'model';
+  text: string;
+  groundingSources?: {
+    uri: string;
+    title: string;
+  }[];
+  isThinking?: boolean;
+}
+
+export interface SearchResult {
+  locations: GeoLocation[];
+  summary: string;
 }
 
 export interface MapViewState {
@@ -77,21 +91,6 @@ export enum LayerType {
   TERRAIN = 'TERRAIN'
 }
 
-export interface ChatMessage {
-  id: string;
-  role: 'user' | 'model';
-  text: string;
-  groundingSources?: {
-    uri: string;
-    title: string;
-  }[];
-  isThinking?: boolean;
-}
-
-export interface SearchResult {
-  locations: GeoLocation[];
-  summary: string;
-}
 
 export interface ElectionResult {
   seccion: string;

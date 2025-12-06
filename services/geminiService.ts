@@ -16,10 +16,9 @@ You help users understand geography, demographics, and terrain.
 If you use Google Maps grounding, ensure you provide helpful summaries.
 `;
 
-const MODEL_ID = "gemini-2.5-flash";
-
 export const searchLocations = async (query: string, center?: {lat: number, lng: number}): Promise<GeoLocation[]> => {
   try {
+    const modelId = "gemini-2.5-flash";
     const prompt = `
       User Query: "${query}"
       Current Map Center: ${center ? `${center.lat}, ${center.lng}` : 'Central Mexico'}
@@ -75,7 +74,7 @@ export const askAssistant = async (query: string, contextLat?: number, contextLn
     
     // Using Google Maps Grounding for real-world info
     const response = await ai.models.generateContent({
-      model: MODEL_ID,
+      model: modelId,
       contents: query,
       config: {
         systemInstruction: SYSTEM_INSTRUCTION_CHAT,

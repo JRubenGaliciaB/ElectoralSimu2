@@ -34,7 +34,6 @@ interface LayerControlProviderProps {
 export const LayerControlProvider: React.FC<LayerControlProviderProps> = ({ children }) => {
   const [activeLayer, setActiveLayer] = useState<LayerType>(LayerType.DARK);
   const [isBaseMapsOpen, setIsBaseMapsOpen] = useState(false);
-
   const [showDistricts, setShowDistricts] = useState(true);
   const [showElectionResults, setShowElectionResults] = useState(false);
   const [showElectionResults21, setShowElectionResults21] = useState(false);

@@ -6,7 +6,7 @@ import { Locate, Menu } from 'lucide-react';
 import { FEDERAL_DISTRICTS_GEOJSON } from './data/geoData';
 import { LayerControlProvider } from './context/LayerControlContext';
 import { MapProvider, useAppContext } from './context/MapContext';
-import { ChatProvider } from './context/ChatContext';
+import { ChatProvider, useChatContext } from './context/ChatContext';
 import WelcomeScreen from './components/WelcomeScreen';
 
 
@@ -17,7 +17,21 @@ const DEFAULT_ZOOM = 9.2;
 const AppContent: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true); {/* Sidebar2 Derecho (main) */} 
   const [isSidebar2Open, setIsSidebar2Open] = useState(false); {/* Sidebar izquierdo info*/}
-  const { handleLocateMe, setMapCenter, setMapZoom } = useAppContext();
+  const { handleLocateMe, // Función de geolocalización
+    setMapCenter, 
+    setMapZoom,
+    userLocation, // Estado de la ubicación del usuario (del MapContext)
+    searchResults // Resultados de la búsqueda para el MapViewer
+  } = useAppContext();
+
+  // 2. Usar funciones del ChatContext (incluye Chat y Búsqueda)
+  const { 
+    chatHistory, 
+    isSearching, 
+    handleChatSend, 
+    handleSearch,
+    onLocationSelect
+  } = useChatContext();
 
 
   {/* useCallback para la gestión del movimiento del mapa */}
@@ -28,12 +42,16 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="relative flex w-full h-screen overflow-hidden bg-gray-100">
-      <LayerControlProvider>
-        <ChatProvider>
+    
           {/* 1. Sidebar2 Container (Izquierda) */}
           <Sidebar2
             isOpen={isSidebar2Open}
             toggleSidebar2={() => setIsSidebar2Open(!isSidebar2Open)}
+            chatHistory={chatHistory}
+            onChatSend={handleChatSend}
+            onSearch={handleSearch}
+            isSearching={isSearching}
+            onLocationSelect={onLocationSelect}
           />
 
           {/* 2. Botón flotante para abrir la Sidebar2 (Izquierda) - visible SOLO si está cerrada */}
@@ -54,6 +72,8 @@ const AppContent: React.FC = () => {
             <MapViewer
               onMapMoveEnd={handleMapMoveEnd}
               districtsData={FEDERAL_DISTRICTS_GEOJSON}
+              locations={searchResults}
+            userLocation={userLocation}
             />
 
             {/* Floating Action Buttons (Locate Me) */}
@@ -73,6 +93,7 @@ const AppContent: React.FC = () => {
           <Sidebar
             isOpen={isSidebarOpen}
             toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+            searchResults={searchResults}
           />
 
           {/* 5. Botón flotante para abrir la Sidebar (Derecha) - visible SOLO si está cerrada */}
@@ -87,9 +108,6 @@ const AppContent: React.FC = () => {
               </button>
             </div>
           )}
-
-        </ChatProvider>
-      </LayerControlProvider>
     </div>
   );
 };
@@ -110,8 +128,12 @@ const App: React.FC = () => {
 
       {/* 2. El resto de la aplicación (el mapa) */}
       <MapProvider initialCenter={DEFAULT_CENTER} initialZoom={DEFAULT_ZOOM}>
-        <AppContent />
-      </MapProvider>
+      <LayerControlProvider>
+ <ChatProvider>
+ <AppContent />
+ </ChatProvider>
+ </LayerControlProvider>
+ </MapProvider>
     </>
   );
 };

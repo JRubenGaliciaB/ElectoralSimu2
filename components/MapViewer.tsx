@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap as useLeafletMap, GeoJSON } from 'react-leaflet';
-import { LayerType } from '../types'; 
+import { LayerType, GeoLocation } from '../types'; 
 import { getIconByCategory, Icons } from './MapIcons';
 import { ELECTION_RESULTS_2024 } from '../data/electionData';
 import { ELECTION_RESULTS_2021 } from '../data/electionData21';
@@ -55,7 +55,7 @@ const MapSizeInvalidator: React.FC = () => {
 // --- MAIN COMPONENT ---
 
 interface MapViewerProps {
- onMapMoveEnd: (center: { lat: number; lng: number }, zoom: number) => void;
+ onMapMoveEnd: (center: { lat: number; lng: number }, zoom: number, locations: GeoLocation[]) => void;
  districtsData?: any;
 }
 
@@ -212,15 +212,19 @@ const geoJsonKey = `geo-layer-${activeElectionData ? activeElectionData.year : '
       )}
 
       {searchResults.map((loc, idx) => (
-        <Marker key={`${loc.lat}-${idx}`} position={[loc.lat, loc.lng]} icon={getIconByCategory(loc.category)}>
-          <Popup>
-            <div className="p-1 text-black">
-              <h3 className="font-bold text-sm">${loc.name}</h3>
-              <p className="text-xs mt-1">${loc.description}</p>
-            </div>
-          </Popup>
-        </Marker>
-      ))}
+          <Marker 
+            key={loc.id || `${loc.lat}-${loc.lng}-${idx}`} 
+            position={[loc.lat, loc.lng]} 
+            icon={getIconByCategory(loc.category)}
+          >
+            <Popup>
+              <div className="p-1 text-black">
+                <h3 className="font-bold text-sm">{loc.name}</h3>
+                {loc.description && <p className="text-xs mt-1">{loc.description}</p>}
+              </div>
+            </Popup>
+          </Marker>
+        ))}
 
       {/* Bottom Center: Opacity Slider */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] flex flex-col gap-2 animate-slideUp w-72">
