@@ -3,6 +3,8 @@ export interface GeoLocation {
   lat: number;
   lng: number;
   name: string;
+  id?: string;
+  description?: string;
 }
 
 export interface ChatMessage {

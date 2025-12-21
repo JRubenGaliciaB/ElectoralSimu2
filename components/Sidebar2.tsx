@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import { Search, MessageSquare, Info, ChevronLeft, X, ChevronRight, Loader, BookOpen, Network, Cpu, Menu } from 'lucide-react';
 import { ChatMessage, GeoLocation } from '../types'; 
 import { useLayerControls } from '../context/LayerControlContext'; 
@@ -44,22 +44,24 @@ interface SearchTabProps {
   onSearch: (query: string) => void;
 }
 
-const SearchTab: React.FC<SearchTabProps> = ({ searchResults, onLocationSelect, isSearching, onSearch }) => {
-  // El estado de input se debe mantener local para que la búsqueda sea inmediata
+const SearchTab: React.FC<SearchTabProps> = ({ searchResults = [], onLocationSelect, isSearching, onSearch }) => {
   const [searchInput, setSearchInput] = useState('');
 
   const handleSearchSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (!searchInput.trim()) return;
-    onSearch(searchInput); // Usa onSearch de las props
+    onSearch(searchInput);
   }, [searchInput, onSearch]);
 
   const clearSearch = useCallback(() => {
     setSearchInput('');
-    onSearch(''); // Usa onSearch de las props para limpiar resultados
+    onSearch('');
   }, [onSearch]);
 
   const showClearButton = searchInput.length > 0 && !isSearching;
+  
+  // Safety: Ensure we have an array to work with
+  const resultsCount = searchResults?.length || 0;
 
   return (
     <div className="space-y-4 text-white">
@@ -80,40 +82,32 @@ const SearchTab: React.FC<SearchTabProps> = ({ searchResults, onLocationSelect, 
             <X size={20} />
           </button>
         )}
-        {!isSearching && !showClearButton && (
-          <button type="submit" disabled={!searchInput.trim()} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-400 disabled:opacity-50" title="Search">
-            <Search size={20} />
-          </button>
-        )}
       </form>
       
-      {/* Search Results */}
       {isSearching && <p className="text-sm text-blue-400">Searching...</p>}
       
-      {!isSearching && searchResults && searchResults.length > 0 ? ( 
- <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
- <h4 className="text-xs font-semibold uppercase text-slate-400">
- Resultados ({searchResults?.length || 0}) {/* 💡 Uso del operador opcional (?) */ }
- </h4>
- {searchResults.map((result: GeoLocation, index) => ( // Usamos GeoLocation de SidebarProps
-              <div 
-                key={result.id || `${result.lat}-${result.lng}-${index}`} 
-                onClick={() => onLocationSelect(result)}
-                className="p-3 bg-slate-700 border border-slate-600 rounded-lg shadow-md hover:bg-slate-600 hover:border-blue-500 cursor-pointer transition-colors"
-              >
-                <p className="font-medium text-sm text-white">{result.name}</p>
-                {/* Aseguramos que description sea opcional para evitar errores */}
-                {result.description && result.description !== result.name && (
-                  <p className="text-xs text-slate-400 mt-1">{result.description}</p>
-                )}
-              </div>
-            )
-          )}
+      {!isSearching && resultsCount > 0 ? ( 
+        <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+          <h4 className="text-xs font-semibold uppercase text-slate-400">
+            Resultados ({resultsCount})
+          </h4>
+          {searchResults.map((result: GeoLocation, index) => (
+            <div 
+              key={result.id || `${result.lat}-${result.lng}-${index}`} 
+              onClick={() => onLocationSelect(result)}
+              className="p-3 bg-slate-700 border border-slate-600 rounded-lg shadow-md hover:bg-slate-600 hover:border-blue-500 cursor-pointer transition-colors"
+            >
+              <p className="font-medium text-sm text-white">{result.name}</p>
+              {result.description && result.description !== result.name && (
+                <p className="text-xs text-slate-400 mt-1">{result.description}</p>
+              )}
+            </div>
+          ))}
         </div>
-      ) : searchInput.length > 0 && !isSearching && searchResults.length === 0 ? (
+      ) : searchInput.length > 0 && !isSearching && resultsCount === 0 ? (
         <p className="text-sm text-slate-400">No results found for "{searchInput}".</p>
       ) : (
-        <p className="text-sm text-slate-400">Enter a term to search for addresses or places.</p>
+        !isSearching && <p className="text-sm text-slate-400">Enter a term to search for addresses or places.</p>
       )}
     </div>
   );
@@ -259,6 +253,42 @@ const Sidebar2: React.FC<SidebarProps> = (props) => {
   const { isOpen, toggleSidebar2, searchResults, onLocationSelect, isSearching, onSearch, chatHistory, onChatSend } = props;
   
   const [activeTab, setActiveTab] = useState<Tab['id']>('info'); 
+
+  const [width, setWidth] = useState(320); // Ancho inicial (equivalente a w-80)
+  const isResizing = useRef(false);
+
+  const startResizing = useCallback((mouseDownEvent: React.MouseEvent) => {
+    isResizing.current = true;
+    // Evita que se seleccione texto mientras arrastras
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    isResizing.current = false;
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+  }, []);
+
+  const resize = useCallback((mouseMoveEvent: MouseEvent) => {
+    if (isResizing.current) {
+      // Calculamos el nuevo ancho. 
+      // Si el panel está a la izquierda, es directamente el clientX del mouse.
+      const newWidth = mouseMoveEvent.clientX;
+      if (newWidth > 250 && newWidth < 600) { // Límites mínimo y máximo
+        setWidth(newWidth);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("mousemove", resize);
+    window.addEventListener("mouseup", stopResizing);
+    return () => {
+      window.removeEventListener("mousemove", resize);
+      window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [resize, stopResizing]);
   
   const TabContent: React.FC | undefined = useMemo(() => {
     switch (activeTab) {
@@ -296,8 +326,17 @@ const Sidebar2: React.FC<SidebarProps> = (props) => {
   }
 
   return (
-    <div className={`h-full w-80 shadow-2xl z-[500] flex-shrink-0 flex flex-col border-r border-slate-700 bg-black fixed top-0 left-0 transition-transform duration-300 ${isOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-full pointer-events-none'}`}>
-      
+<div 
+      style={{ width: `${width}px` }} // Aplicamos el ancho dinámico
+      className={`h-full shadow-2xl z-[500] flex-shrink-0 flex flex-col border-r border-slate-700 bg-black fixed top-0 left-0 transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}
+    >
+      {/* BARRA DE ARRASTRE (RESIZER) */}
+      <div
+        onMouseDown={startResizing}
+        className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-blue-500 transition-colors z-[501]"
+        title="Arrastra para ajustar tamaño"
+      />
+            
       {/* 1. TOP BAR (Close Button) - Dark mode style */}
       <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-900/95 backdrop-blur-sm">
         <h2 className="text-xl font-bold text-white">IA Tools</h2>

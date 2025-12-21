@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { Layers, ScanEye, CircleDollarSign, ChevronDown, ChevronUp, Vote, ChevronRight } from 'lucide-react';
 import { LayerType } from '../types';
 import { useLayerControls } from '../context/LayerControlContext';
@@ -46,9 +46,57 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [isElectoralDataOpen, setIsElectoralDataOpen] = useState(true); // false, si quieres que inicie plegado // menu electoral
   const [isSocioDOpen, setIsSocioDOpen] = useState(false); // menu sociodemografico
 
+  const [width, setWidth] = useState(320); // Ancho inicial
+  const isResizing = useRef(false);
+
+  const startResizing = useCallback(() => {
+    isResizing.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  }, []);
+
+  const stopResizing = useCallback(() => {
+    isResizing.current = false;
+    document.body.style.cursor = 'default';
+    document.body.style.userSelect = 'auto';
+  }, []);
+
+  const resize = useCallback((mouseMoveEvent: MouseEvent) => {
+    if (isResizing.current) {
+      // Como el sidebar está a la derecha, el ancho es la distancia 
+      // desde el borde derecho de la ventana (window.innerWidth) hasta el mouse
+      const newWidth = window.innerWidth - mouseMoveEvent.clientX;
+      
+      if (newWidth > 280 && newWidth < 600) { // Límites min y max
+        setWidth(newWidth);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("mousemove", resize);
+    window.addEventListener("mouseup", stopResizing);
+    return () => {
+      window.removeEventListener("mousemove", resize);
+      window.removeEventListener("mouseup", stopResizing);
+    };
+  }, [resize, stopResizing]);
 
   return (
-<div className={`h-full bg-black shadow-2xl z-[500] flex-shrink-0 flex flex-col border-l border-gray-200 fixed top-0 right-0 transition-transform duration-300 ${isOpen ? 'translate-x-0 w-80 pointer-events-auto' : 'translate-x-full w-80 pointer-events-none'}`}> 	 	
+    <div 
+      style={{ width: isOpen ? `${width}px` : '0px' }} // Ancho dinámico
+      className={`h-full bg-black shadow-2xl z-[500] flex-shrink-0 flex flex-col border-l border-slate-700 fixed top-0 right-0 transition-transform duration-300 ${
+        isOpen ? 'translate-x-0 pointer-events-auto' : 'translate-x-full pointer-events-none'
+      }`}
+    >
+      {/* MANEJADOR DE ARRASTRE (Borde izquierdo del panel derecho) */}
+      {isOpen && (
+        <div
+          onMouseDown={startResizing}
+          className="absolute top-0 left-0 w-1.5 h-full cursor-col-resize hover:bg-blue-500/50 transition-colors z-[501]"
+        />
+      )}
+
   {/* 1. TOP BAR (Close Button) - Dark mode style */}
 <div className="flex justify-between items-center p-4 border-b border-slate-800 bg-slate-900/95 backdrop-blur-sm">
   <button // Botón  cerrar Sidebar
